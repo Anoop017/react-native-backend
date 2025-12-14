@@ -4,12 +4,20 @@ import  connectDB  from './db.js';
 import mongoose from 'mongoose'
 import {User} from './models/Users.js'
 import authRouter from './routes/auth.js'
+import authMiddleware from './middleware/auth.js';
 
 const app = express();
 app.use(express.json());
 
 
 app.use('/auth',authRouter)
+
+
+// from middleware...................
+app.get('/me',authMiddleware,(req,res)=>{
+  const user = (req as any).user; 
+  res.json({user});
+})
 
 
 app.get('/db-check', async (_req, res) => {
