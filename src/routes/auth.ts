@@ -1,17 +1,21 @@
 import express from 'express'
-import jwt from 'jsonwebtoken'
+import jwt, { type SignOptions } from 'jsonwebtoken'
 import {User} from '../models/Users.js'
 import bcrypt from 'bcrypt'
 import dotenv from 'dotenv'
 
 dotenv.config();
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d'
 const SALT_ROUNDS = 10;
 
 
 router.post('/signup', async (req,res)=>{
+    if(!JWT_SECRET){
+        return res.status(500).json({message:"Server configuration error"})
+    };
+
     try {
         const {email, password} = req.body as {email?:string, password?:string}
         if (!email || !password){
@@ -26,8 +30,13 @@ router.post('/signup', async (req,res)=>{
         const hashed = await bcrypt.hash(password, SALT_ROUNDS)
         const user = await User.create({email, password:hashed})
 
-        const token = jwt.sign({userId:user._id.toString(),email:user.email},JWT_SECRET,{expiresIn:JWT_EXPIRES_IN})
-        res.status(201).json({message:'User Created', user:{id:user._id, email:user.email}, token})
+        const token = jwt.sign(
+            {userId:user._id.toString(),email:user.email},
+            JWT_SECRET,
+            {expiresIn:JWT_EXPIRES_IN} as SignOptions
+        )
+        
+            res.status(201).json({message:'User Created', user:{id:user._id, email:user.email}, token})
         
     } catch (error) {
         res.status(500).json({error:String(error)})
@@ -35,6 +44,10 @@ router.post('/signup', async (req,res)=>{
 })
 
 router.post('/login', async (req,res)=>{
+    if(!JWT_SECRET){
+        return res.status(500).json({message:"Server configuration error"})
+    };
+
     try {
         const {email, password} = req.body as {email?:string, password?:string}
         if(!email || !password){
@@ -51,7 +64,12 @@ router.post('/login', async (req,res)=>{
             return(res.status(401).json({message:"Password not found"}))
         };
 
-        const token = jwt.sign({userId:user._id.toString(),email:user.email},JWT_SECRET,{expiresIn:JWT_EXPIRES_IN})
+        const token = jwt.sign
+        ({userId:user._id.toString(),email:user.email},
+        JWT_SECRET,
+        {expiresIn:JWT_EXPIRES_IN} as SignOptions
+    )
+        
         res.json({message:'logged In', token, user:{id:user._id, email:user.email}})
         
     } catch (error) {
