@@ -4,7 +4,7 @@ export interface IQuizAttempt {
     userId : Types.ObjectId;
     keyword:string;
 
-    ststus : 'in_progress' | 'submitted' | 'abandoned'
+    status : 'in_progress' | 'submitted' | 'abandoned'
 
     startedAt : Date;
     endedAt? : Date;
