@@ -8,7 +8,7 @@ export interface IQuizAttempt {
 
     startedAt : Date;
     endedAt? : Date;
-    timeStamp? : number; // in seconds, huh ??
+    timeSpent? : number; // in seconds, huh ??
 
     score: number;
     totalQuestions : number;
@@ -37,7 +37,7 @@ const QuizAttemptSchema = new Schema<IQuizAttempt>(
         endedAt:{
             type:Date
         },
-        timeStamp:{
+        timeSpent:{
             type:Number,
             default:0
         },
@@ -60,6 +60,11 @@ const QuizAttemptSchema = new Schema<IQuizAttempt>(
         percentage:{
             type:Number,
             default:0
+        },
+        status:{
+            type:String,
+            enum:["in_progress", "submitted","abandoned"],
+            default:"in_progress"
         }
     },
     {timestamps:true}
