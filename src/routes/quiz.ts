@@ -13,7 +13,7 @@ router.post('/start', authMiddleware, async (req,res)=>{
         const {keyword,totalQuestions,wrongAnswers, percentage} = req.body
 
         if(!keyword || !totalQuestions){
-            return res.status(400).json({error:"Keyword is required"})
+            return res.status(400).json({error:"Keyword is required!!"})
         }
         const newAttempt = await QuizAttempt.create({
             userId,
@@ -68,6 +68,10 @@ router.post('/submit', authMiddleware, async (req, res)=>{
         let totalQuestions = attempt.totalQuestions;
         let wrongAnswers = attempt.totalQuestions - attempt.correctAnswers
         let percentage = (correctAnswers/totalQuestions) * 100
+
+        attempt.wrongAnswers = wrongAnswers;
+        attempt.percentage = percentage;
+        attempt.score = correctAnswers;
 
         await attempt.save()
 
